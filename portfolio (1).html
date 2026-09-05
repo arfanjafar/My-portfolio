@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arfan Jafar — Software Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+
+  /* ============================================================
+     EDIT ME: swap these for your own name, role, links, and copy.
+     Search for "EDIT:" comments throughout this file.
+  ============================================================ */
+
+  :root{
+    --bg: #0A1220;
+    --surface: #121C30;
+    --ink: #EAF1FB;
+    --ink-soft: #93A6C4;
+    --accent: #5FA8E8;
+    --accent-soft: #17233B;
+    --line: #223252;
+    --max: 720px;
+  }
+
+  *{ box-sizing: border-box; }
+  html{ scroll-behavior: smooth; }
+
+  body{
+    margin: 0;
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    background: linear-gradient(120deg, #0A1220, #0E1B33, #091425, #10203E);
+    background-size: 300% 300%;
+    animation: driftBg 18s ease infinite;
+  }
+
+  @keyframes driftBg{
+    0%{ background-position: 0% 50%; }
+    50%{ background-position: 100% 50%; }
+    100%{ background-position: 0% 50%; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    body{ animation: none; background-position: 0% 50%; }
+  }
+
+  /* ---------- Cursor glow ---------- */
+
+  #cursorGlow{
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: radial-gradient(
+      160px circle at var(--mx, 50%) var(--my, 50%),
+      rgba(140,190,255,0.55),
+      rgba(90,140,220,0.15) 55%,
+      transparent 80%
+    );
+    mix-blend-mode: screen;
+    transition: background 0.05s linear;
+  }
+  @media (prefers-reduced-motion: reduce){
+    #cursorGlow{ display: none; }
+  }
+
+  /* ---------- Custom circle cursor ---------- */
+
+  @media (hover: hover) and (pointer: fine){
+    body{ cursor: none; }
+  }
+  #cursorDot{
+    position: fixed;
+    top: 0; left: 0;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 1.5px solid #FFFFFF;
+    background: transparent;
+    pointer-events: none;
+    z-index: 999;
+    transform: translate(-50%, -50%);
+    transition: width 0.15s ease, height 0.15s ease, background 0.15s ease, opacity 0.15s ease;
+    opacity: 0;
+  }
+  #cursorDot.active{ opacity: 1; }
+  #cursorDot.down{
+    width: 14px; height: 14px;
+    background: #FFFFFF;
+  }
+  @media (prefers-reduced-motion: reduce), (hover: none), (pointer: coarse){
+    #cursorDot{ display: none; }
+  }
+
+  h1, h2, h3, .serif{
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+
+  a{ color: inherit; }
+
+  .wrap{
+    max-width: var(--max);
+    margin: 0 auto;
+    padding: 0 28px;
+  }
+
+  /* ---------- Loader ---------- */
+
+  #loader{
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    transition: opacity 0.7s ease, visibility 0.7s ease;
+  }
+  #loader.hidden{
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+  #loader .mark{
+    font-family: 'Fraunces', serif;
+    font-size: 15px;
+    letter-spacing: 0.02em;
+    color: var(--ink-soft);
+  }
+  #loader .mark span{
+    opacity: 0;
+    transition: opacity 0.15s ease;
+  }
+  #loader .count{
+    font-size: 13px;
+    color: var(--ink-soft);
+    font-variant-numeric: tabular-nums;
+  }
+  #loader .rule{
+    width: 120px;
+    height: 1px;
+    background: var(--line);
+    position: relative;
+    overflow: hidden;
+  }
+  #loader .rule::after{
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--accent);
+    transform: scaleX(var(--rule-progress, 0));
+    transform-origin: left;
+    transition: transform 0.1s linear;
+  }
+
+  /* ---------- Reveal (single orchestrated entrance) ---------- */
+
+  .reveal{
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  body.ready .reveal{
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  body.ready .reveal:nth-child(1){ transition-delay: 0.05s; }
+  body.ready .reveal:nth-child(2){ transition-delay: 0.15s; }
+  body.ready .reveal:nth-child(3){ transition-delay: 0.25s; }
+  body.ready .reveal:nth-child(4){ transition-delay: 0.35s; }
+
+  @media (prefers-reduced-motion: reduce){
+    #loader, .reveal, html{ transition: none !important; }
+    .reveal{ opacity: 1; transform: none; }
+  }
+
+  /* ---------- Nav ---------- */
+
+  header{
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 20;
+    background: rgba(10,18,32,0.8);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.3s ease;
+  }
+  header.scrolled{ border-bottom-color: var(--line); }
+  header .bar{
+    max-width: var(--max);
+    margin: 0 auto;
+    padding: 18px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo{
+    font-family: 'Fraunces', serif;
+    font-size: 17px;
+  }
+  nav ul{
+    list-style: none;
+    display: flex;
+    gap: 24px;
+    margin: 0; padding: 0;
+  }
+  nav a{
+    text-decoration: none;
+    font-size: 14px;
+    color: var(--ink-soft);
+    border-bottom: 1px solid transparent;
+    padding-bottom: 2px;
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+  nav a:hover{ color: var(--ink); border-color: var(--ink); }
+
+  /* ---------- Music control panel (fixed, bottom right) ---------- */
+
+  #musicPanel{
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 16px;
+    background: #1E3A5F;
+    border: 1px solid #2C4E7C;
+    border-radius: 999px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+  }
+
+  #musicToggle{
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    border: 1px solid #3A5E8C;
+    background: transparent;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    color: #DCEBFF;
+    flex-shrink: 0;
+    transition: border-color 0.2s ease, color 0.2s ease;
+  }
+  #musicToggle:hover{ border-color: #DCEBFF; color: #FFFFFF; }
+  #musicToggle svg{ width: 13px; height: 13px; }
+
+  #volumeSlider{
+    width: 84px;
+    cursor: pointer;
+  }
+
+  /* ---------- Hero ---------- */
+
+  .hero{
+    padding: 168px 0 96px;
+  }
+  .eyebrow-line{
+    font-size: 14px;
+    color: var(--accent);
+    margin-bottom: 18px;
+  }
+  .hero h1{
+    font-size: clamp(38px, 6vw, 56px);
+    line-height: 1.08;
+    margin: 0 0 20px;
+  }
+  .hero p{
+    color: var(--ink-soft);
+    max-width: 46ch;
+    margin: 0 0 32px;
+    font-size: 16.5px;
+  }
+  .links-list{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 22px;
+    list-style: none;
+    padding: 0; margin: 0 0 40px;
+  }
+  .links-list a{
+    font-size: 14px;
+    text-decoration: none;
+    color: var(--ink-soft);
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 1px;
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+  .links-list a:hover{ color: var(--accent); border-color: var(--accent); }
+
+  .btn{
+    display: inline-block;
+    background: var(--ink);
+    color: var(--bg);
+    text-decoration: none;
+    font-size: 14.5px;
+    padding: 13px 26px;
+    border-radius: 3px;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.2s ease;
+  }
+  .btn:hover{ background: var(--accent); }
+  .btn.ghost{
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--line);
+  }
+  .btn.ghost:hover{ background: var(--surface); border-color: var(--ink); }
+
+  /* ---------- Sections ---------- */
+
+  section{ padding: 84px 0; border-top: 1px solid var(--line); }
+
+  .section-head{
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 40px;
+  }
+  .section-head h2{ font-size: 26px; margin: 0; }
+  .section-head .index{
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+
+  /* About */
+  .about-grid{
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 48px;
+  }
+  .about-grid p{ color: var(--ink-soft); margin: 0 0 16px; }
+  .about-note{
+    background: var(--accent-soft);
+    border-radius: 4px;
+    padding: 20px;
+    font-size: 14.5px;
+    color: var(--ink);
+    align-self: start;
+  }
+  .about-note strong{ display: block; margin-bottom: 6px; font-family: 'Fraunces', serif; font-weight: 500; }
+
+  /* Skills */
+  .skill-row{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .skill-row:first-child{ border-top: 1px solid var(--line); }
+  .skill-name{ font-size: 16px; }
+  .skill-level{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--ink-soft);
+    font-size: 13.5px;
+  }
+  .dots{ display: flex; gap: 5px; }
+  .dots span{
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--line);
+  }
+  .dots span.filled{ background: var(--accent); }
+
+  /* Work / Hire */
+  .offer-list{ list-style: none; margin: 0 0 40px; padding: 0; }
+  .offer-list li{
+    padding: 16px 0;
+    border-bottom: 1px solid var(--line);
+    color: var(--ink-soft);
+    font-size: 16px;
+  }
+  .offer-list li:first-child{ border-top: 1px solid var(--line); }
+  .offer-list li strong{ color: var(--ink); font-weight: 500; }
+
+  /* Contact */
+  form{ display: flex; flex-direction: column; gap: 16px; max-width: 480px; }
+  label{ font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px; display: block; }
+  input, textarea{
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 12px 14px;
+    font-family: inherit;
+    font-size: 15px;
+    color: var(--ink);
+  }
+  input:focus, textarea:focus{
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+  textarea{ resize: vertical; min-height: 110px; }
+
+  footer{
+    padding: 32px 0 48px;
+    color: var(--ink-soft);
+    font-size: 13px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  @media (max-width: 640px){
+    .about-grid{ grid-template-columns: 1fr; }
+    nav ul{ display: none; }
+    header .bar{ padding: 16px 20px; }
+    .hero{ padding-top: 140px; }
+    footer{ flex-direction: column; gap: 8px; }
+    #volumeSlider{ width: 44px; }
+  }
+
+</style>
+</head>
+<body>
+
+  <div id="cursorGlow"></div>
+  <div id="cursorDot"></div>
+
+  <!-- ---------- Loader ---------- -->
+  <div id="loader">
+    <div class="mark" id="loaderMark"><!-- EDIT: initials or wordmark --></div>
+    <div class="rule" id="loaderRule"></div>
+    <div class="count" id="loaderCount">0%</div>
+  </div>
+
+  <!-- ---------- Nav ---------- -->
+  <header id="siteHeader">
+    <div class="bar">
+      <div class="logo">AJ<!-- EDIT: your initials --></div>
+      <nav>
+        <ul>
+          <li><a href="#about">About</a></li>
+          <li><a href="#skills">Skills</a></li>
+          <li><a href="#work">Work</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       PASTE YOUR MP3 FILE HERE
+       ------------------------------------------------------------
+       This project can't include the actual "Loser" audio file
+       (copyrighted music), so add it yourself:
+         1. Get your own legal copy of the track.
+         2. Name the file "loser.mp3".
+         3. Put it in the SAME FOLDER as this HTML file.
+       That's it — the src below already points at that filename.
+  ============================================================ -->
+  <audio autoplay id="bgm" loop>
+    <source src="loser.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- ---------- Music control panel (bottom right) ---------- -->
+  <div id="musicPanel">
+    <button id="musicToggle" aria-label="Toggle background music" title="Play music">
+      <svg id="playIcon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+      <svg id="pauseIcon" viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+    </button>
+    <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.6" aria-label="Music volume">
+  </div>
+
+  <!-- ---------- Hero ---------- -->
+  <section class="hero" style="border-top:none;">
+    <div class="wrap">
+      <div class="eyebrow-line reveal">Available for freelance work</div>
+      <h1 class="reveal">Hi, I'm Arfan Jafar.</h1>
+      <p class="reveal">
+        I'm a software engineer who builds for the web and desktop — clean interfaces,
+        dependable back ends, and the occasional weekend project that goes too far.
+        <!-- EDIT: your one-line pitch -->
+      </p>
+      <ul class="links-list reveal">
+        <li><a href="mailto:arfanjafar00@gmail.com">Email</a></li>
+        <li><a href="https://discord.com/users/997133904991490182" target="_blank" rel="noopener">Discord</a></li>
+      </ul>
+      <a href="#contact" class="btn reveal">Start a project</a>
+    </div>
+  </section>
+
+  <!-- ---------- About ---------- -->
+  <section id="about">
+    <div class="wrap">
+      <div class="section-head"><h2>About</h2><span class="index">01</span></div>
+      <div class="about-grid">
+        <div>
+          <p>
+            I've spent the last few years writing Java for desktop tools, building
+            responsive front ends, and learning something new with every project.
+            I care about interfaces that feel obvious to use and code that's easy
+            to hand off to the next person — including future me.
+          </p>
+          <p>
+            Outside of client work, I maintain a few open-source utilities and I'm
+            always tinkering with something that doesn't have a deadline.
+          </p>
+        </div>
+        <div class="about-note">
+          <strong>Currently</strong>
+          Open to freelance projects and software engineering roles. Based remote,
+          working across time zones.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------- Skills ---------- -->
+  <section id="skills">
+    <div class="wrap">
+      <div class="section-head"><h2>Skills</h2><span class="index">02</span></div>
+
+      <div class="skill-row">
+        <div class="skill-name">Java</div>
+        <div class="skill-level">Advanced <span class="dots"><span class="filled"></span><span class="filled"></span><span class="filled"></span><span class="filled"></span></span></div>
+      </div>
+      <div class="skill-row">
+        <div class="skill-name">HTML &amp; CSS</div>
+        <div class="skill-level">Advanced <span class="dots"><span class="filled"></span><span class="filled"></span><span class="filled"></span><span class="filled"></span></span></div>
+      </div>
+      <div class="skill-row">
+        <div class="skill-name">JavaScript</div>
+        <div class="skill-level">Advanced <span class="dots"><span class="filled"></span><span class="filled"></span><span class="filled"></span><span class="filled"></span></span></div>
+      </div>
+      <div class="skill-row">
+        <div class="skill-name">Git &amp; GitHub</div>
+        <div class="skill-level">Intermediate <span class="dots"><span class="filled"></span><span class="filled"></span><span class="filled"></span><span></span></span></div>
+      </div>
+      <div class="skill-row">
+        <div class="skill-name">Desktop apps (Java Swing)</div>
+        <div class="skill-level">Comfortable <span class="dots"><span class="filled"></span><span class="filled"></span><span></span><span></span></span></div>
+      </div>
+      <div class="skill-row">
+        <div class="skill-name">Responsive UI</div>
+        <div class="skill-level">Advanced <span class="dots"><span class="filled"></span><span class="filled"></span><span class="filled"></span><span class="filled"></span></span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------- Work / Hire ---------- -->
+  <section id="work">
+    <div class="wrap">
+      <div class="section-head"><h2>Let's build something</h2><span class="index">03</span></div>
+      <ul class="offer-list">
+        <li><strong>Java applications</strong> — desktop tools and utilities built to last.</li>
+        <li><strong>Websites</strong> — fast, responsive, and easy to maintain.</li>
+        <li><strong>Desktop software</strong> — from prototype to packaged release.</li>
+        <li><strong>Front-end development</strong> — interfaces that feel considered.</li>
+        <li><strong>Bug fixes &amp; maintenance</strong> — for projects already in flight.</li>
+      </ul>
+      <a href="#contact" class="btn ghost">Get in touch</a>
+    </div>
+  </section>
+
+  <!-- ---------- Contact ---------- -->
+  <section id="contact">
+    <div class="wrap">
+      <div class="section-head"><h2>Contact</h2><span class="index">04</span></div>
+      <form id="contactForm">
+        <div>
+          <label for="name">Your name</label>
+          <input type="text" id="name" required>
+        </div>
+        <div>
+          <label for="email">Your email</label>
+          <input type="email" id="email" required>
+        </div>
+        <div>
+          <label for="message">Message</label>
+          <textarea id="message" required></textarea>
+        </div>
+        <button type="submit" class="btn" style="align-self:flex-start;">Send message</button>
+      </form>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap" style="display:flex; justify-content:space-between; width:100%;">
+      <span>© 2026 Arfan Jafar</span>
+      <span>Built by hand</span>
+    </div>
+  </footer>
+
+<script>
+  // ---------- Loader sequence ----------
+  const mark = document.getElementById('loaderMark');
+  const wordmark = "ARFAN JAFAR"; // EDIT: shown letter-by-letter during load
+  mark.innerHTML = wordmark.split('').map(ch => `<span>${ch === ' ' ? '&nbsp;' : ch}</span>`).join('');
+  const letters = mark.querySelectorAll('span');
+
+  const countEl = document.getElementById('loaderCount');
+  const ruleEl = document.getElementById('loaderRule');
+  let progress = 0;
+
+  const timer = setInterval(() => {
+    progress += Math.random() * 18 + 6;
+    if (progress >= 100) {
+      progress = 100;
+      clearInterval(timer);
+      setTimeout(finishLoading, 300);
+    }
+    countEl.textContent = Math.floor(progress) + '%';
+    ruleEl.style.setProperty('--rule-progress', progress / 100);
+
+    const revealCount = Math.floor((progress / 100) * letters.length);
+    letters.forEach((l, i) => l.style.opacity = i < revealCount ? '1' : '0');
+  }, 140);
+
+  function finishLoading(){
+    document.getElementById('loader').classList.add('hidden');
+    document.body.classList.add('ready');
+    attemptAutoplay();
+  }
+
+  // ---------- Header scroll state ----------
+  const header = document.getElementById('siteHeader');
+  window.addEventListener('scroll', () => {
+    header.classList.toggle('scrolled', window.scrollY > 10);
+  });
+
+  // ---------- Cursor glow ----------
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!prefersReducedMotion) {
+    const root = document.documentElement;
+    const cursorDot = document.getElementById('cursorDot');
+
+    window.addEventListener('mousemove', (e) => {
+      const xPct = (e.clientX / window.innerWidth) * 100;
+      const yPct = (e.clientY / window.innerHeight) * 100;
+      root.style.setProperty('--mx', xPct + '%');
+      root.style.setProperty('--my', yPct + '%');
+
+      cursorDot.style.left = e.clientX + 'px';
+      cursorDot.style.top = e.clientY + 'px';
+      cursorDot.classList.add('active');
+    });
+
+    window.addEventListener('mousedown', () => cursorDot.classList.add('down'));
+    window.addEventListener('mouseup', () => cursorDot.classList.remove('down'));
+    document.addEventListener('mouseleave', () => cursorDot.classList.remove('active'));
+  }
+
+  // ---------- Music toggle ----------
+  const bgm = document.getElementById('bgm');
+  const musicToggle = document.getElementById('musicToggle');
+  const playIcon = document.getElementById('playIcon');
+  const pauseIcon = document.getElementById('pauseIcon');
+  const volumeSlider = document.getElementById('volumeSlider');
+  let playing = false;
+
+  bgm.volume = parseFloat(volumeSlider.value);
+
+  volumeSlider.addEventListener('input', () => {
+    bgm.volume = parseFloat(volumeSlider.value);
+  });
+
+  function setPlayingState(isPlaying){
+    playing = isPlaying;
+    playIcon.style.display = isPlaying ? 'none' : 'block';
+    pauseIcon.style.display = isPlaying ? 'block' : 'none';
+    musicToggle.title = isPlaying ? 'Pause music' : 'Play music';
+  }
+
+  function attemptAutoplay(){
+    bgm.play().then(() => {
+      setPlayingState(true);
+    }).catch(() => {
+      // Most browsers block unmuted autoplay until the visitor interacts
+      // with the page at least once. Start playback on that first
+      // interaction instead, so it still feels automatic.
+      setPlayingState(false);
+      const resumeOnInteraction = () => {
+        bgm.play().then(() => setPlayingState(true)).catch(() => {});
+      };
+      document.addEventListener('click', resumeOnInteraction, { once: true });
+      document.addEventListener('keydown', resumeOnInteraction, { once: true });
+      document.addEventListener('touchstart', resumeOnInteraction, { once: true });
+    });
+  }
+
+  musicToggle.addEventListener('click', () => {
+    if (!playing) {
+      bgm.play().then(() => setPlayingState(true)).catch(() => {});
+    } else {
+      bgm.pause();
+      setPlayingState(false);
+    }
+  });
+
+  // ---------- Contact form (mailto fallback, no backend needed) ----------
+  document.getElementById('contactForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+    const message = document.getElementById('message').value;
+    const subject = encodeURIComponent(`Project inquiry from ${name}`);
+    const body = encodeURIComponent(`${message}\n\n— ${name} (${email})`);
+    window.location.href = `mailto:arfanjafar00@gmail.com?subject=${subject}&body=${body}`;
+  });
+</script>
+
+</body>
+</html>
